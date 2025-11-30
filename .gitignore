@@ -5,6 +5,7 @@
 .env.production
 .env.*.local
 !.env.example
+AGENTS.md
 
 # Dependencies
 node_modules/

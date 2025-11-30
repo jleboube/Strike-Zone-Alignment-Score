@@ -1,6 +1,44 @@
 # SZAS - Strike Zone Alignment Score
 
+<div align="center">
+
+[![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://docs.docker.com/compose/)
+[![GitHub stars](https://img.shields.io/github/stars/jleboube/Strike-Zone-Alignment-Score?style=social)](https://github.com/jleboube/Strike-Zone-Alignment-Score/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/jleboube/Strike-Zone-Alignment-Score?style=social)](https://github.com/jleboube/Strike-Zone-Alignment-Score/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/jleboube/Strike-Zone-Alignment-Score)](https://github.com/jleboube/Strike-Zone-Alignment-Score/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/jleboube/Strike-Zone-Alignment-Score)](https://github.com/jleboube/Strike-Zone-Alignment-Score/pulls)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CCBY--NC--SA4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/muscl3n3rd)
+
+
+
 A Sabermetric web application for analyzing MLB strike zone dynamics. SZAS quantifies the alignment and divergences among three distinct strike zones: the textbook rulebook zone, the umpire-called zone, and the batter-swing zone.
+
+[Demo](https://szas.baseballstatsclub.com) • [Screenshots](#screenshots) • [Features](#features) • [Quick Start](#quick-start)
+
+
+</div>
+
+## Screenshots
+
+Strike Zone Alignment Score Landing Page
+
+![Alt text](docs/szas1.png "Strike Zone Alignment Score Landing Page")
+
+SZAS Parameters
+
+![Alt text](docs/szas2.png "SZAS Parameters")
+
+SZAS Results
+
+![Alt text](docs/szas3.png "SZAS Results")
+![Alt text](docs/szas4.png "SZAS Results")
+
+SZAS Methodology
+
+![Alt text](docs/szas5.png "SZAS Methodology")
+
 
 ## Features
 
