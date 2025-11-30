@@ -1,0 +1,52 @@
+# Environment files - NEVER commit .env with secrets
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+!.env.example
+
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+dist/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Build outputs
+frontend/dist/
+*.egg
+
+# Data files (except sample)
+data/*.csv
+!data/sample_pitches.csv
+
+# Temporary files
+tmp/
+temp/

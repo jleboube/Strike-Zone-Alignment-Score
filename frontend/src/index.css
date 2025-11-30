@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Card styles */
+.card {
+  @apply bg-slate-800 rounded-xl border border-slate-700 shadow-lg;
+}
+
+/* Zone heatmap gradient */
+.zone-gradient {
+  background: linear-gradient(to right,
+    rgba(239, 68, 68, 0.8),
+    rgba(249, 115, 22, 0.8),
+    rgba(234, 179, 8, 0.8),
+    rgba(34, 197, 94, 0.8)
+  );
+}
+
+/* Strike zone visualization */
+.strike-zone-container {
+  position: relative;
+  aspect-ratio: 1;
+  max-width: 400px;
+}
+
+/* Stat card hover effect */
+.stat-card {
+  @apply transition-all duration-200 hover:scale-105 hover:border-blue-500;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
