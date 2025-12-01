@@ -138,6 +138,9 @@ function Bayesian() {
                 <option value={3}>Top 3 Batters</option>
                 <option value={5}>Top 5 Batters</option>
                 <option value={10}>Top 10 Batters</option>
+                <option value={25}>Top 25 Batters</option>
+                <option value={50}>Top 50 Batters</option>
+                <option value={100}>Top 100 Batters</option>
               </select>
             </div>
 
@@ -157,6 +160,7 @@ function Bayesian() {
           <p className="text-slate-400 text-sm mt-4">
             Analysis focuses on at-bats with 4+ pitches in the 2025 season.
             This allows us to observe the batter's swing behavior before the umpire makes later calls.
+            Larger analyses (50+ batters) may take a minute to complete.
           </p>
         </div>
 

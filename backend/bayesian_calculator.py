@@ -26,8 +26,17 @@ from scipy.stats import chi2_contingency
 import warnings
 import logging
 
+try:
+    from pybaseball import playerid_reverse_lookup
+    PYBASEBALL_AVAILABLE = True
+except ImportError:
+    PYBASEBALL_AVAILABLE = False
+
 warnings.filterwarnings('ignore')
 logger = logging.getLogger(__name__)
+
+# Cache for player names to avoid repeated lookups
+_player_name_cache = {}
 
 
 class BayesianInfluenceCalculator:
@@ -460,10 +469,28 @@ class BayesianInfluenceCalculator:
                     "see more called strikes, contrary to the 'freeswinger effect' hypothesis.")
 
     def _get_batter_name(self, data: pd.DataFrame) -> str:
-        """Extract batter name from data."""
-        # Note: In Statcast, player_name is the PITCHER's name
-        # We'll return a placeholder or use cached lookup
-        batter_id = data['batter'].iloc[0]
+        """Extract batter name from data using pybaseball lookup."""
+        batter_id = int(data['batter'].iloc[0])
+
+        # Check cache first
+        if batter_id in _player_name_cache:
+            return _player_name_cache[batter_id]
+
+        # Try pybaseball lookup
+        if PYBASEBALL_AVAILABLE:
+            try:
+                lookup = playerid_reverse_lookup([batter_id], key_type='mlbam')
+                if not lookup.empty:
+                    first_name = str(lookup.iloc[0].get('name_first', '')).title()
+                    last_name = str(lookup.iloc[0].get('name_last', '')).title()
+                    if first_name and last_name:
+                        name = f"{first_name} {last_name}"
+                        _player_name_cache[batter_id] = name
+                        return name
+            except Exception as e:
+                logger.warning(f"Could not lookup player {batter_id}: {e}")
+
+        # Fallback
         return f"Player {batter_id}"
 
     def get_available_batters_for_analysis(self, pitch_data: pd.DataFrame, min_long_abs: int = 10) -> pd.DataFrame:
