@@ -30,9 +30,10 @@ services:
       - FLASK_PORT=5000
       - FLASK_DEBUG=${FLASK_DEBUG:-false}
       - PRELOAD_DATA=${PRELOAD_DATA:-true}
-      - DEFAULT_YEAR=${DEFAULT_YEAR:-2024}
+      - DEFAULT_YEAR=${DEFAULT_YEAR:-2025}
       - GUNICORN_WORKERS=${GUNICORN_WORKERS:-2}
       - GUNICORN_TIMEOUT=${GUNICORN_TIMEOUT:-120}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
     volumes:
       - szas-data:/app/data
     restart: unless-stopped

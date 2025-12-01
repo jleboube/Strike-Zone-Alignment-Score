@@ -18,7 +18,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)
+
+# Configure CORS for domain hosting
+# ALLOWED_ORIGINS can be comma-separated list of origins
+# Example: https://szas.example.com,https://www.szas.example.com
+allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*')
+if allowed_origins and allowed_origins != '*':
+    origins = [origin.strip() for origin in allowed_origins.split(',')]
+    logger.info(f"CORS configured for origins: {origins}")
+else:
+    origins = "*"
+    logger.info("CORS configured for all origins (development mode)")
+
+CORS(app, origins=origins, supports_credentials=True)
 
 # Initialize components
 calculator = SZASCalculator()
