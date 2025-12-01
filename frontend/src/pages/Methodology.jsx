@@ -21,6 +21,9 @@ function Methodology() {
               <Link to="/" className="text-slate-300 hover:text-white transition-colors">
                 Calculator
               </Link>
+              <Link to="/bayesian" className="text-slate-300 hover:text-white transition-colors">
+                Bayesian Method
+              </Link>
               <Link to="/documentation" className="text-slate-300 hover:text-white transition-colors">
                 Documentation
               </Link>
@@ -315,6 +318,113 @@ function Methodology() {
                 </tr>
               </tbody>
             </table>
+          </div>
+        </section>
+
+        {/* Bayesian Influence Analysis */}
+        <section className="card p-8 mb-8">
+          <h2 className="text-2xl font-semibold text-amber-400 mb-6">Bayesian Influence Analysis</h2>
+          <p className="text-slate-300 mb-6">
+            Based on research proposed by <span className="text-amber-400 font-medium">Tangotiger</span>, this analysis
+            explores whether umpire strike/ball calls are influenced by observing a batter's swing behavior earlier in an at-bat.
+          </p>
+
+          <h3 className="text-lg font-medium text-white mb-4">The Freeswinger Hypothesis</h3>
+          <div className="bg-amber-900/20 border border-amber-800 rounded-lg p-4 mb-6">
+            <p className="text-slate-300">
+              <strong className="text-amber-400">Key Question:</strong> When a "freeswinger" (who swings at everything close)
+              takes a borderline pitch, does the umpire unconsciously think: "They swing at anything close, so if they took it,
+              it must be a ball"?
+            </p>
+          </div>
+
+          <h3 className="text-lg font-medium text-white mb-4">The Three Zones Framework</h3>
+          <div className="grid md:grid-cols-3 gap-4 mb-6">
+            <div className="p-4 bg-slate-900/50 rounded-lg border border-blue-800">
+              <h4 className="font-medium text-blue-400 mb-2">Textbook Zone</h4>
+              <p className="text-sm text-slate-400">The rulebook definition of the strike zone</p>
+            </div>
+            <div className="p-4 bg-slate-900/50 rounded-lg border border-green-800">
+              <h4 className="font-medium text-green-400 mb-2">Umpire Zone</h4>
+              <p className="text-sm text-slate-400">What the umpire actually calls on takes</p>
+            </div>
+            <div className="p-4 bg-slate-900/50 rounded-lg border border-purple-800">
+              <h4 className="font-medium text-purple-400 mb-2">Batter Zone</h4>
+              <p className="text-sm text-slate-400">Where the batter chooses to swing (their personal zone)</p>
+            </div>
+          </div>
+
+          <h3 className="text-lg font-medium text-white mb-4">Methodology</h3>
+          <div className="bg-slate-900 rounded-lg p-4 mb-6">
+            <ol className="space-y-3 text-slate-300">
+              <li className="flex gap-3">
+                <span className="text-amber-400 font-mono">1.</span>
+                <span><strong className="text-white">Filter Long At-Bats:</strong> Focus on at-bats with 4+ pitches to observe swing behavior before later calls</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="text-amber-400 font-mono">2.</span>
+                <span><strong className="text-white">Calculate Cumulative Swing Rate:</strong> Track the batter's swing rate on pitches 1 through N-1 within each at-bat</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="text-amber-400 font-mono">3.</span>
+                <span><strong className="text-white">Model Umpire Calls:</strong> Use logistic regression on taken pitches (pitch 4+):</span>
+              </li>
+            </ol>
+            <div className="mt-4 p-3 bg-slate-800 rounded-lg">
+              <p className="font-mono text-sm text-amber-300 text-center">
+                P(called_strike) = σ(β₀ + β₁·plate_x + β₂·plate_z + β₃·plate_x² + β₄·plate_z² + <span className="text-white">β₅·prior_swing_rate</span>)
+              </p>
+            </div>
+            <ol className="space-y-3 text-slate-300 mt-4" start="4">
+              <li className="flex gap-3">
+                <span className="text-amber-400 font-mono">4.</span>
+                <span><strong className="text-white">Interpret β₅:</strong> The swing rate coefficient reveals umpire influence</span>
+              </li>
+            </ol>
+          </div>
+
+          <h3 className="text-lg font-medium text-white mb-4">Interpreting Results</h3>
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            <div className="p-4 bg-amber-900/20 border border-amber-800 rounded-lg">
+              <h4 className="font-medium text-amber-400 mb-2">Negative Coefficient (β₅ &lt; 0)</h4>
+              <p className="text-sm text-slate-400 mb-2">
+                Supports the freeswinger effect: higher swing rate in the AB leads to fewer called strikes on takes.
+              </p>
+              <p className="text-xs text-amber-300">
+                Umpire thinks: "They swing at everything, so if they didn't swing, it must be a ball"
+              </p>
+            </div>
+            <div className="p-4 bg-blue-900/20 border border-blue-800 rounded-lg">
+              <h4 className="font-medium text-blue-400 mb-2">Positive Coefficient (β₅ &gt; 0)</h4>
+              <p className="text-sm text-slate-400 mb-2">
+                Opposite effect: higher swing rate leads to more called strikes on takes.
+              </p>
+              <p className="text-xs text-blue-300">
+                Umpire might think: "This batter swings freely, so this must be a strike they missed"
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 bg-slate-900/50 rounded-lg mb-6">
+            <h4 className="font-medium text-white mb-2">Odds Ratio Interpretation</h4>
+            <p className="text-sm text-slate-300">
+              The odds ratio (e^β₅) indicates the multiplicative change in strike odds per unit increase in swing rate:
+            </p>
+            <ul className="text-sm text-slate-400 mt-2 space-y-1">
+              <li>• <span className="text-white">1.0x:</span> No influence detected</li>
+              <li>• <span className="text-amber-400">&lt;1.0x:</span> Higher swing rate decreases strike probability</li>
+              <li>• <span className="text-blue-400">&gt;1.0x:</span> Higher swing rate increases strike probability</li>
+            </ul>
+          </div>
+
+          <h3 className="text-lg font-medium text-white mb-4">Minimum Data Requirements</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="p-3 bg-slate-900/50 rounded-lg">
+              <p className="text-sm text-slate-300"><span className="text-white font-medium">Long At-Bats:</span> At least 10 at-bats with 4+ pitches</p>
+            </div>
+            <div className="p-3 bg-slate-900/50 rounded-lg">
+              <p className="text-sm text-slate-300"><span className="text-white font-medium">Takes for Analysis:</span> At least 20 taken pitches in qualifying at-bats</p>
+            </div>
           </div>
         </section>
 

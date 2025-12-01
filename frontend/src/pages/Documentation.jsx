@@ -21,6 +21,9 @@ function Documentation() {
               <Link to="/" className="text-slate-300 hover:text-white transition-colors">
                 Calculator
               </Link>
+              <Link to="/bayesian" className="text-slate-300 hover:text-white transition-colors">
+                Bayesian Method
+              </Link>
               <Link to="/documentation" className="text-white font-medium">
                 Documentation
               </Link>
@@ -113,12 +116,67 @@ function Documentation() {
             </div>
 
             {/* Get Summary */}
-            <div>
+            <div className="border-b border-slate-700 pb-6">
               <div className="flex items-center gap-3 mb-2">
                 <span className="px-2 py-1 bg-green-900/50 text-green-400 text-xs font-mono rounded">GET</span>
                 <code className="text-blue-400">/api/data/summary</code>
               </div>
               <p className="text-slate-400 text-sm">Get summary statistics of available data.</p>
+            </div>
+
+            {/* Bayesian Endpoints Section */}
+            <div className="pt-4 mb-4">
+              <h3 className="text-lg font-medium text-amber-400 mb-4">Bayesian Analysis Endpoints</h3>
+            </div>
+
+            {/* Bayesian Status */}
+            <div className="border-b border-slate-700 pb-6">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="px-2 py-1 bg-green-900/50 text-green-400 text-xs font-mono rounded">GET</span>
+                <code className="text-blue-400">/api/bayesian/status</code>
+              </div>
+              <p className="text-slate-400 text-sm">Check if data is available for Bayesian analysis (requires at-bat tracking columns).</p>
+            </div>
+
+            {/* Bayesian Analyze */}
+            <div className="border-b border-slate-700 pb-6">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="px-2 py-1 bg-blue-900/50 text-blue-400 text-xs font-mono rounded">POST</span>
+                <code className="text-blue-400">/api/bayesian/analyze</code>
+              </div>
+              <p className="text-slate-400 text-sm mb-3">Run Bayesian influence analysis on top swing-rate batters.</p>
+              <div className="bg-slate-900 rounded-lg p-4">
+                <p className="text-xs text-slate-500 mb-2">Request Body:</p>
+                <pre className="text-sm text-slate-300 overflow-x-auto">{`{
+  "top_n": 10,            // Number of batters to analyze (default: 10)
+  "year": 2025            // Season year (default: 2025)
+}`}</pre>
+              </div>
+            </div>
+
+            {/* Bayesian Batter */}
+            <div className="border-b border-slate-700 pb-6">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="px-2 py-1 bg-blue-900/50 text-blue-400 text-xs font-mono rounded">POST</span>
+                <code className="text-blue-400">/api/bayesian/batter</code>
+              </div>
+              <p className="text-slate-400 text-sm mb-3">Analyze a specific batter for umpire influence patterns.</p>
+              <div className="bg-slate-900 rounded-lg p-4">
+                <p className="text-xs text-slate-500 mb-2">Request Body:</p>
+                <pre className="text-sm text-slate-300 overflow-x-auto">{`{
+  "batter_id": 660271,    // MLB player ID (required)
+  "year": 2025            // Season year (default: 2025)
+}`}</pre>
+              </div>
+            </div>
+
+            {/* Bayesian Available Batters */}
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="px-2 py-1 bg-green-900/50 text-green-400 text-xs font-mono rounded">GET</span>
+                <code className="text-blue-400">/api/bayesian/available-batters</code>
+              </div>
+              <p className="text-slate-400 text-sm">List batters with enough long at-bats (4+ pitches) for Bayesian analysis.</p>
             </div>
           </div>
         </section>
@@ -211,6 +269,35 @@ function Documentation() {
             <div>
               <dt className="font-medium text-white">sz_top / sz_bot</dt>
               <dd className="text-slate-400 text-sm">Top and bottom of the batter's personalized strike zone</dd>
+            </div>
+
+            {/* Bayesian Terms */}
+            <div className="pt-4 mt-4 border-t border-slate-700">
+              <h3 className="text-lg font-medium text-amber-400 mb-4">Bayesian Analysis Terms</h3>
+            </div>
+            <div>
+              <dt className="font-medium text-white">Freeswinger</dt>
+              <dd className="text-slate-400 text-sm">A batter with overall swing rate above 55%</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-white">Patient Hitter</dt>
+              <dd className="text-slate-400 text-sm">A batter with overall swing rate below 45%</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-white">Long At-Bat</dt>
+              <dd className="text-slate-400 text-sm">An at-bat with 4 or more pitches, allowing swing behavior observation</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-white">Swing Rate Coefficient</dt>
+              <dd className="text-slate-400 text-sm">Logistic regression coefficient measuring umpire call influence by swing behavior</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-white">Odds Ratio</dt>
+              <dd className="text-slate-400 text-sm">Multiplicative effect on strike probability per unit increase in swing rate</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-white">Freeswinger Effect</dt>
+              <dd className="text-slate-400 text-sm">Hypothesized tendency for umpires to call more balls when a freeswinger takes a pitch</dd>
             </div>
           </dl>
         </section>
