@@ -10,6 +10,7 @@ from flask_cors import CORS
 import numpy as np
 import pandas as pd
 from szas_calculator import SZASCalculator
+from bayesian_calculator import BayesianInfluenceCalculator
 from data_loader import DataLoader
 import os
 import logging
@@ -34,6 +35,7 @@ CORS(app, origins=origins, supports_credentials=True)
 
 # Initialize components
 calculator = SZASCalculator()
+bayesian_calculator = BayesianInfluenceCalculator()
 data_loader = DataLoader()
 
 # Pre-download data on startup if configured
@@ -367,6 +369,201 @@ def get_available_years():
         'default': DEFAULT_YEAR,
         'note': 'Statcast data available from 2015-present'
     })
+
+
+# =============================================================================
+# Bayesian Umpire Influence Analysis Endpoints
+# =============================================================================
+
+@app.route('/api/bayesian/analyze', methods=['POST'])
+def bayesian_analyze():
+    """
+    Run Bayesian umpire influence analysis on selected batters.
+
+    Request body:
+    {
+        "batter_ids": [int] (optional - list of MLB player IDs),
+        "top_n": int (optional - analyze top N batters if batter_ids not provided, default 5),
+        "year": int (default: 2025)
+    }
+
+    Returns analysis of whether umpire calls are influenced by batter swing behavior.
+    """
+    try:
+        data = request.get_json() or {}
+
+        batter_ids = data.get('batter_ids')
+        top_n = data.get('top_n', 5)
+        year = data.get('year', DEFAULT_YEAR)
+
+        # Load pitch data
+        pitch_data = data_loader.get_data(year=year)
+
+        if pitch_data is None or len(pitch_data) == 0:
+            return jsonify({
+                'error': 'No data available',
+                'message': f'Could not load Statcast data for {year}'
+            }), 500
+
+        # Check if we have required columns for Bayesian analysis
+        if 'at_bat_number' not in pitch_data.columns:
+            return jsonify({
+                'error': 'Data missing required columns',
+                'message': 'Cached data does not include at-bat tracking columns. Please re-download the data.',
+                'missing_columns': ['at_bat_number', 'pitch_number']
+            }), 400
+
+        # Run analysis
+        logger.info(f"Running Bayesian analysis for year {year}, top_n={top_n}")
+        result = bayesian_calculator.analyze_multiple_batters(
+            pitch_data,
+            batter_ids=batter_ids,
+            top_n=top_n
+        )
+
+        result['year'] = year
+        result['data_source'] = 'MLB Statcast'
+
+        return jsonify(result)
+
+    except Exception as e:
+        logger.error(f"Bayesian analysis error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'error': 'Analysis error',
+            'message': str(e)
+        }), 500
+
+
+@app.route('/api/bayesian/analyze-batter/<int:batter_id>', methods=['GET'])
+def bayesian_analyze_single(batter_id):
+    """
+    Run Bayesian analysis on a single batter.
+
+    URL params:
+        batter_id: MLB player ID
+        year: Season year (default: 2025)
+    """
+    try:
+        year = request.args.get('year', DEFAULT_YEAR, type=int)
+
+        pitch_data = data_loader.get_data(year=year)
+
+        if pitch_data is None or len(pitch_data) == 0:
+            return jsonify({
+                'error': 'No data available',
+                'message': f'Could not load Statcast data for {year}'
+            }), 500
+
+        if 'at_bat_number' not in pitch_data.columns:
+            return jsonify({
+                'error': 'Data missing required columns',
+                'message': 'Please re-download data to include at-bat tracking columns.'
+            }), 400
+
+        result = bayesian_calculator.analyze_batter(pitch_data, batter_id)
+        result['year'] = year
+
+        return jsonify(result)
+
+    except Exception as e:
+        logger.error(f"Bayesian single batter analysis error: {e}")
+        return jsonify({
+            'error': 'Analysis error',
+            'message': str(e)
+        }), 500
+
+
+@app.route('/api/bayesian/batters', methods=['GET'])
+def bayesian_get_batters():
+    """
+    Get list of batters suitable for Bayesian analysis.
+
+    Only returns batters with sufficient long at-bats (4+ pitches).
+    """
+    try:
+        year = request.args.get('year', DEFAULT_YEAR, type=int)
+        min_long_abs = request.args.get('min_long_abs', 10, type=int)
+
+        pitch_data = data_loader.get_data(year=year)
+
+        if pitch_data is None or len(pitch_data) == 0:
+            return jsonify([])
+
+        if 'at_bat_number' not in pitch_data.columns:
+            return jsonify({
+                'error': 'Data missing required columns',
+                'message': 'Please re-download data to include at-bat tracking columns.'
+            }), 400
+
+        batters = bayesian_calculator.get_available_batters_for_analysis(
+            pitch_data,
+            min_long_abs=min_long_abs
+        )
+
+        # Merge with batter names from main batter list
+        all_batters = data_loader.get_available_batters(year=year)
+        if 'name' in all_batters.columns:
+            batters = batters.merge(
+                all_batters[['batter_id', 'name']],
+                on='batter_id',
+                how='left'
+            )
+            batters['name'] = batters['name'].fillna(batters['batter_id'].apply(lambda x: f'Player {x}'))
+
+        # Return top 50
+        batters = batters.head(50)
+
+        return jsonify(batters.to_dict(orient='records'))
+
+    except Exception as e:
+        logger.error(f"Error getting Bayesian batters: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/bayesian/status', methods=['GET'])
+def bayesian_status():
+    """
+    Check if Bayesian analysis is available (data has required columns).
+    """
+    try:
+        year = request.args.get('year', DEFAULT_YEAR, type=int)
+
+        pitch_data = data_loader.get_data(year=year)
+
+        if pitch_data is None or len(pitch_data) == 0:
+            return jsonify({
+                'available': False,
+                'reason': 'No data loaded',
+                'year': year
+            })
+
+        has_at_bat = 'at_bat_number' in pitch_data.columns
+        has_pitch_num = 'pitch_number' in pitch_data.columns
+
+        if not has_at_bat or not has_pitch_num:
+            return jsonify({
+                'available': False,
+                'reason': 'Data missing at-bat tracking columns. Re-download required.',
+                'year': year,
+                'has_at_bat_number': has_at_bat,
+                'has_pitch_number': has_pitch_num
+            })
+
+        return jsonify({
+            'available': True,
+            'year': year,
+            'total_pitches': len(pitch_data),
+            'columns_present': ['at_bat_number', 'pitch_number']
+        })
+
+    except Exception as e:
+        logger.error(f"Error checking Bayesian status: {e}")
+        return jsonify({
+            'available': False,
+            'reason': str(e)
+        }), 500
 
 
 if __name__ == '__main__':

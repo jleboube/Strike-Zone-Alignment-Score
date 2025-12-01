@@ -240,7 +240,10 @@ class DataLoader:
             'description', 'type', 'zone', 'pitch_type',
             'release_speed', 'player_name', 'pitch_name',
             'home_team', 'away_team',
-            'umpire'  # Home plate umpire name - available directly in Statcast!
+            'umpire',  # Home plate umpire name - available directly in Statcast!
+            # At-bat tracking columns for Bayesian analysis
+            'at_bat_number', 'pitch_number', 'inning', 'inning_topbot',
+            'balls', 'strikes', 'events'
         ]
 
         # Also grab batter name columns if available

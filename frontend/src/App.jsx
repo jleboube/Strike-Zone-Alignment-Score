@@ -8,6 +8,7 @@ import ResultsPanel from './components/ResultsPanel'
 import DataSummary from './components/DataSummary'
 import Documentation from './pages/Documentation'
 import Methodology from './pages/Methodology'
+import Bayesian from './pages/Bayesian'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
 const MIN_PITCHES = 50
@@ -123,6 +124,9 @@ function Calculator() {
                 <Link to="/" className="text-white font-medium">
                   Calculator
                 </Link>
+                <Link to="/bayesian" className="text-slate-300 hover:text-white transition-colors">
+                  Bayesian Method
+                </Link>
                 <Link to="/documentation" className="text-slate-300 hover:text-white transition-colors">
                   Documentation
                 </Link>
@@ -224,6 +228,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Calculator />} />
+        <Route path="/bayesian" element={<Bayesian />} />
         <Route path="/documentation" element={<Documentation />} />
         <Route path="/methodology" element={<Methodology />} />
       </Routes>
